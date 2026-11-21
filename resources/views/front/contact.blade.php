@@ -1,63 +1,6 @@
 @extends('layouts.front')
-
 @section('content')
-    <div style="padding: 10px;">
-        <h3>Contact Page: {{ $page->title }}</h3>
-        <div>{!! $page->content !!}</div>
-        
-        <!-- Render Locations dynamically from Site Settings -->
-        @php
-            $locations = json_decode(\App\Models\Setting::get('contact_locations', '[]'), true);
-        @endphp
-        
-        @if(!empty($locations))
-            <h4 style="margin-top: 25px; color: #ff9800; border-bottom: 1px solid #444; padding-bottom: 5px;">Our Locations & Contact Details</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 15px;">
-                @foreach($locations as $loc)
-                    <div style="background-color: #1e1e1e; border: 1px solid #333; padding: 20px; border-radius: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                        <strong style="color: #00bcd4; font-size: 1.15em; display: block; margin-bottom: 8px;">{{ $loc['name'] }}</strong>
-                        <p style="margin: 8px 0; color: #ccc; font-style: italic;">{{ $loc['address'] }}</p>
-                        
-                        @if(!empty($loc['phones']))
-                            <div style="margin-top: 12px;">
-                                <strong style="font-size: 0.9em; color: #ffeb3b;">Phone Numbers:</strong>
-                                <ul style="margin: 5px 0 0 0; padding-left: 20px; color: #a5d6a7;">
-                                    @foreach((array)$loc['phones'] as $phone)
-                                        <li>{{ $phone }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        
-                        @if(!empty($loc['emails']))
-                            <div style="margin-top: 12px;">
-                                <strong style="font-size: 0.9em; color: #ffeb3b;">Email Addresses:</strong>
-                                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
-                                    @foreach((array)$loc['emails'] as $email)
-                                        <li><a href="mailto:{{ $email }}" style="color: #90caf9; text-decoration: none;">{{ $email }}</a></li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        @if(!empty($loc['map_iframe']))
-                            <div style="margin-top: 15px; border-radius: 4px; overflow: hidden; border: 1px solid #444;">
-                                <style>
-                                    .map-container iframe {
-                                        width: 100% !important;
-                                        height: 200px !important;
-                                        border: 0;
-                                        display: block;
-                                    }
-                                </style>
-                                <div class="map-container">
-                                    {!! $loc['map_iframe'] !!}
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
+<section class="page-hero"><div class="container"><p class="eyebrow">A PRIVATE FIRST STEP</p><h1>Let’s start with your question.</h1><p>Tell us a little about what you would like to discuss. Share only what you feel comfortable sharing.</p></div></section>
+<section class="section-pad contact-section"><div class="container contact-grid"><div class="contact-aside"><p class="eyebrow">HERE TO LISTEN</p><h2>A conversation can begin with one simple question.</h2><p>Choose a topic or tell us what is on your mind. We’ll use the contact details you provide to follow up about your enquiry.</p><div class="contact-promise"><span>✧</span><p><strong>Your enquiry stays personal.</strong><br>Please avoid including sensitive information in this form.</p></div></div><form class="contact-form" id="contact-form"><div class="form-row"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required maxlength="255" placeholder="Name"></div><div class="form-row"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="255" placeholder="you@example.com"></div><div class="form-row"><label for="phone">Phone number <span>(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="Best number to reach you"></div><div class="form-row"><label for="subject">What would you like to discuss?</label><input id="subject" name="subject" maxlength="255" value="{{ request('service') }}" placeholder="For example, relationship guidance"></div><div class="form-row"><label for="message">Your message</label><textarea id="message" name="message" required maxlength="5000" rows="5" placeholder="Share a little about your question..."></textarea></div><input type="hidden" name="source" value="Website contact form"><button class="btn btn-plum btn-lg" type="submit">Send private enquiry <span>↗</span></button><p class="form-status" id="contact-status" role="status" aria-live="polite"></p><p class="form-fineprint">By sending this form, you’re asking Astro Kundan to contact you about your enquiry.</p></form></div></section>
+@include('front.partials.faq', ['faqs' => $faqs ?? []])
 @endsection

@@ -14,5 +14,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RolePermissionSeeder::class);
         $this->call(SampleDataSeeder::class);
+        $this->call(AstroKundanContentSeeder::class);
     }
 }

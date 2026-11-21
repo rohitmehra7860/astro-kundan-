@@ -10,7 +10,7 @@
 @endif
 
 <!-- Primary SEO Metadata -->
-<title>{{ $seo['meta_title'] ?? $page->title ?? config('app.name', 'Corporate Dashboard') }}</title>
+<title>{{ $seo['meta_title'] ?? $page->title ?? \App\Models\Setting::get('site_name', 'Astro Kundan') }}</title>
 <meta name="description" content="{{ $seo['meta_description'] ?? '' }}">
 <meta name="keywords" content="{{ $seo['meta_keywords'] ?? '' }}">
 <meta name="robots" content="{{ $seo['robots_instructions'] ?? 'index, follow' }}">
