@@ -12,7 +12,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="mainNav"><ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
                 <li><a class="nav-link" href="{{ route('home') }}">Home</a></li><li><a class="nav-link" href="{{ route('pages.show', ['slug' => 'about']) }}">About</a></li>
-                <li><a class="nav-link" href="{{ route('services.index') }}">Services</a></li><li><a class="nav-link" href="{{ route('pages.show', ['slug' => 'blog']) }}">Journal</a></li>
+                <li><a class="nav-link" href="{{ route('services.index') }}">Services</a></li><li><a class="nav-link" href="{{ route('pages.show', ['slug' => 'blog']) }}">Blog</a></li>
                 <li><a class="btn btn-plum nav-cta" href="{{ route('pages.show', ['slug' => 'contact']) }}">Book a consultation <span aria-hidden="true">↗</span></a></li>
             </ul></div>
         </nav>
