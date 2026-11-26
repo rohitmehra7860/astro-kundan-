@@ -26,6 +26,11 @@ class Category extends Model
         return $this->hasMany(Post::class);
     }
 
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
     public function featuredImage()
     {
         return $this->belongsTo(MediaUpload::class, 'featured_image_id');

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\WebPageController;
 
 Route::get('/', [WebPageController::class, 'home'])->name('home');
+Route::redirect('/home', '/', 301)->name('home.alias');
 
 Route::get('/admin/verify-email', \App\Filament\Pages\Auth\VerifyEmail::class)->name('filament.admin.auth.verify-email');
 
@@ -52,6 +53,12 @@ Route::post('/admin/media/upload-ajax', [\App\Http\Controllers\Admin\MediaUpload
     ->name('admin.media.upload-ajax');
 
 Route::get('/sitemap.xml', [App\Http\Controllers\Api\SitemapController::class, 'generate'])->name('sitemap');
+Route::get('/robots.txt', function () {
+    $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+    $content = "User-agent: *\nDisallow:\n\nSitemap: {$frontendUrl}/sitemap.xml\n";
+
+    return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots');
 
 if (app()->environment('local')) {
     Route::get('/preview-contact-mail', function () {

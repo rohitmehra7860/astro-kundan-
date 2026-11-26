@@ -42,14 +42,14 @@ class WebPageController extends Controller
         }
 
         $seo = $this->getSeoFields($page);
-        $seo['canonical_url'] = url('/');
+        $this->setFallbackSocialImage($seo, $this->getEditorialImageUrl($page));
+        $siteRoot = rtrim(env('FRONTEND_URL', config('app.url')), '/') . '/';
+        $seo['canonical_url'] = $siteRoot;
         if (!empty($seo['schema_json_ld'])) {
-            $seo['schema_json_ld']['@id'] = url('/').'#webpage';
-            $seo['schema_json_ld']['url'] = url('/');
+            $seo['schema_json_ld']['@id'] = $siteRoot . '#webpage';
+            $seo['schema_json_ld']['url'] = $siteRoot;
         }
-        if (!empty($seo['breadcrumb_json_ld']['itemListElement'][0])) {
-            $seo['breadcrumb_json_ld']['itemListElement'][0]['item'] = url('/');
-        }
+        $seo['breadcrumb_json_ld'] = null;
         $faqs = $this->getVisibleFaqs($page, $seo);
         $seo['faq_json_ld'] = $this->getFaqJsonLd($faqs);
 
@@ -80,6 +80,7 @@ class WebPageController extends Controller
         }
 
         $seo = $this->getSeoFields($page);
+        $this->setFallbackSocialImage($seo, $this->getEditorialImageUrl($page));
         $faqs = $this->getVisibleFaqs($page, $seo);
         $seo['faq_json_ld'] = $this->getFaqJsonLd($faqs);
 
@@ -129,6 +130,7 @@ class WebPageController extends Controller
             ->firstOrFail();
 
         $seo = $this->getSeoFields($post);
+        $this->setFallbackSocialImage($seo, $this->getEditorialImageUrl($post));
         $faqs = $this->getVisibleFaqs($post, $seo);
         $seo['faq_json_ld'] = $this->getFaqJsonLd($faqs);
 
@@ -189,6 +191,7 @@ class WebPageController extends Controller
             ->firstOrFail();
 
         $seo = $this->getSeoFields($service);
+        $this->setFallbackSocialImage($seo, $this->getEditorialImageUrl($service));
         $faqs = $this->getVisibleFaqs($service, $seo);
         $seo['faq_json_ld'] = $this->getFaqJsonLd($faqs);
 
@@ -214,5 +217,41 @@ class WebPageController extends Controller
         return collect($faqs)->filter(fn ($faq) => !empty($faq['question']) && !empty($faq['answer']))
             ->unique(fn ($faq) => mb_strtolower(trim($faq['question'])))
             ->values()->all();
+    }
+
+    private function getEditorialImageUrl($model): ?string
+    {
+        $image = null;
+        if ($model instanceof Page && $model->slug === 'home') {
+            $image = 'images/astrologer-hero.jpg';
+        } elseif ($model instanceof Post) {
+            $image = [
+                'what-to-expect-astrology-consultation' => 'images/blog-assets/consultation-expectations.jpg',
+                'kundli-matching-compatibility-conversation' => 'images/blog-assets/kundli-compatibility.jpg',
+                'thoughtful-relationship-choices' => 'images/blog-assets/relationship-reflection.jpg',
+            ][$model->slug] ?? null;
+        } elseif ($model instanceof Service) {
+            $image = [
+                'love-relationship-guidance' => 'images/services/love-relationship-guidance.jpg',
+                'marriage-compatibility' => 'images/services/marriage-compatibility.jpg',
+                'kundli-matching' => 'images/services/kundli-matching.jpg',
+                'personal-horoscope-consultation' => 'images/services/kundli-matching.jpg',
+                'vashikaran-guidance' => 'images/services/love-relationship-guidance.jpg',
+                'negative-energy-guidance' => 'images/services/negative-energy-guidance.jpg',
+            ][$model->slug] ?? null;
+        }
+
+        return $image ? asset($image) : null;
+    }
+
+    private function setFallbackSocialImage(array &$seo, ?string $imageUrl): void
+    {
+        if (empty($seo['og_image_url']) && $imageUrl) {
+            $seo['og_image_url'] = $imageUrl;
+            $seo['twitter_image'] = $imageUrl;
+            if (!empty($seo['schema_json_ld'])) {
+                $seo['schema_json_ld']['image'] = $imageUrl;
+            }
+        }
     }
 }

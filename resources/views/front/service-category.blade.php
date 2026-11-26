@@ -11,7 +11,7 @@
                 @foreach($categories as $cat)
                     <div style="background-color: #1e1e1e; border: 1px solid #333; padding: 20px; border-radius: 5px;">
                         <h5 style="margin: 0 0 10px 0;">
-                            <a href="{{ url('/blog/category/' . $cat->slug) }}" style="color: #00bcd4; text-decoration: none; font-size: 1.1em;">{{ $cat->name }}</a>
+                            <a href="{{ url('/services/category/' . $cat->slug) }}" style="color: #00bcd4; text-decoration: none; font-size: 1.1em;">{{ $cat->name }}</a>
                         </h5>
                         <p style="color: #ccc; font-size: 0.95em; line-height: 1.4;">{{ $cat->description ?? 'No description provided.' }}</p>
                     </div>

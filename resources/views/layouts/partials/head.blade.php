@@ -39,6 +39,12 @@
 @if(!empty($seo['og_image_url']))
     <meta property="og:image" content="{{ $seo['og_image_url'] }}">
 @endif
+@if(!empty($seo['article_published_time']))
+    <meta property="article:published_time" content="{{ $seo['article_published_time'] }}">
+    <meta property="article:modified_time" content="{{ $seo['article_modified_time'] ?? $seo['article_published_time'] }}">
+    @if(!empty($seo['article_section']))<meta property="article:section" content="{{ $seo['article_section'] }}">@endif
+    @if(!empty($seo['article_author']))<meta property="article:author" content="{{ $seo['article_author'] }}">@endif
+@endif
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="{{ $seo['twitter_card'] ?? 'summary_large_image' }}">

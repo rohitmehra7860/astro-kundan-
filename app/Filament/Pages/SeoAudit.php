@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\Service;
 use Filament\Pages\Page as FilamentPage;
 use Filament\Support\Icons\Heroicon;
 use BackedEnum;
@@ -58,9 +59,14 @@ class SeoAudit extends FilamentPage
     protected function runAudit(): void
     {
         // Fetch resources
-        $pages = Page::with('seoMetadata')->get();
-        $posts = Post::with('seoMetadata')->get();
-        $categories = Category::with('seoMetadata')->get();
+        $pages = Page::with(['seoMetadata', 'featuredImage'])->get();
+        $posts = Post::with(['seoMetadata', 'featuredImage'])->get();
+        $categories = Category::where(function ($query) {
+                $query->whereHas('posts', fn ($posts) => $posts->where('status', 'published'))
+                    ->orWhereHas('services', fn ($services) => $services->where('status', 'published'));
+            })
+            ->with(['seoMetadata', 'featuredImage'])->get();
+        $services = Service::with(['seoMetadata', 'featuredImage'])->get();
 
         $items = [];
         $totalScore = 0;
@@ -85,9 +91,18 @@ class SeoAudit extends FilamentPage
             $items[] = $audit;
         }
 
+        // Audit Services
+        foreach ($services as $service) {
+            $audit = $this->auditResource($service, 'Service', $service->title, \App\Filament\Resources\Services\ServiceResource::getUrl('edit', ['record' => $service->id]));
+            $items[] = $audit;
+        }
+
         // Audit Categories
         foreach ($categories as $category) {
-            $editUrl = \App\Filament\Resources\Categories\BlogCategoryResource::getUrl('edit', ['record' => $category->id]);
+            $resource = $category->type === 'service'
+                ? \App\Filament\Resources\Categories\ServiceCategoryResource::class
+                : \App\Filament\Resources\Categories\BlogCategoryResource::class;
+            $editUrl = $resource::getUrl('edit', ['record' => $category->id]);
             $audit = $this->auditResource($category, 'Category', $category->name, $editUrl);
             $items[] = $audit;
         }
@@ -191,7 +206,7 @@ class SeoAudit extends FilamentPage
         }
 
         // 4. Open Graph Image
-        if (!empty($seo->og_image_id)) {
+        if ($this->hasShareImage($model, $seo)) {
             $score += 5;
         } else {
             $issues[] = ['type' => 'warning', 'message' => 'Missing social sharing (Open Graph) image.'];
@@ -224,5 +239,34 @@ class SeoAudit extends FilamentPage
             'status' => $status,
             'issues' => $issues,
         ];
+    }
+
+    protected function hasShareImage($model, $seo): bool
+    {
+        if (!empty($seo->og_image_id) || !empty($model->featuredImage)) {
+            return true;
+        }
+
+        $image = null;
+        if ($model instanceof Page && $model->slug === 'home') {
+            $image = 'images/astrologer-hero.jpg';
+        } elseif ($model instanceof Post) {
+            $image = [
+                'what-to-expect-astrology-consultation' => 'images/blog-assets/consultation-expectations.jpg',
+                'kundli-matching-compatibility-conversation' => 'images/blog-assets/kundli-compatibility.jpg',
+                'thoughtful-relationship-choices' => 'images/blog-assets/relationship-reflection.jpg',
+            ][$model->slug] ?? null;
+        } elseif ($model instanceof Service) {
+            $image = [
+                'love-relationship-guidance' => 'images/services/love-relationship-guidance.jpg',
+                'marriage-compatibility' => 'images/services/marriage-compatibility.jpg',
+                'kundli-matching' => 'images/services/kundli-matching.jpg',
+                'personal-horoscope-consultation' => 'images/services/kundli-matching.jpg',
+                'vashikaran-guidance' => 'images/services/love-relationship-guidance.jpg',
+                'negative-energy-guidance' => 'images/services/negative-energy-guidance.jpg',
+            ][$model->slug] ?? null;
+        }
+
+        return $image ? file_exists(public_path($image)) : false;
     }
 }

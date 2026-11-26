@@ -35,7 +35,9 @@ trait HasSeoFallbacks
         } elseif ($model instanceof \App\Models\Page) {
             $canonicalPath = '/' . $slug;
         } elseif ($model instanceof \App\Models\Category) {
-            $canonicalPath = '/blog/category/' . $slug;
+            $canonicalPath = $model->type === 'service'
+                ? '/services/category/' . $slug
+                : '/blog/category/' . $slug;
         } elseif ($model instanceof \App\Models\Service) {
             $canonicalPath = '/services/' . $slug;
         }
