@@ -182,7 +182,7 @@ class AstroKundanContentSeeder extends Seeder
                 'title' => 'Astro Kundan',
                 'content' => 'Personal astrology consultations for love, marriage, relationships, and life guidance.',
                 'meta_title' => 'Astro Kundan | Love, Marriage & Astrology Guidance',
-                'meta_description' => 'Explore personal astrology consultations for relationship, marriage, kundli, and horoscope questions.',
+                'meta_description' => 'Private astrology consultations for love problems, marriage concerns, kundli matching, vashikaran questions, and worries about black magic or negative energy.',
                 'faqs' => [
                     ['question' => 'How do I enquire about a consultation?', 'answer' => 'Choose a service and send an enquiry using the contact form. Astro Kundan can follow up using the contact details you provide.'],
                     ['question' => 'Does astrology guarantee a specific result?', 'answer' => 'No. Astrology guidance is interpretive and cannot guarantee relationship, marriage, or future outcomes.'],
@@ -266,6 +266,10 @@ class AstroKundanContentSeeder extends Seeder
                     'meta_description' => $metaDescription,
                     'faqs' => $faqs,
                 ]);
+            }
+
+            if ($slug === 'home' && $seo->meta_description === 'Explore personal astrology consultations for relationship, marriage, kundli, and horoscope questions.') {
+                $seo->update(['meta_description' => $metaDescription]);
             }
         }
 
