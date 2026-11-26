@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: website_backend_app
+    container_name: astro_kundan_app
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     restart: unless-stopped
     working_dir: /var/www
@@ -16,14 +16,14 @@ services:
       sh -ec 'composer install --no-interaction --prefer-dist
       && exec php-fpm'
     networks:
-      - website_backend_network
+      - astro_kundan_network
     depends_on:
       - mysql
       - redis
 
   nginx:
     image: nginx:alpine
-    container_name: website_backend_nginx
+    container_name: astro_kundan_nginx
     restart: unless-stopped
     ports:
       - "127.0.0.1:8001:80"
@@ -31,38 +31,38 @@ services:
       - ./:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
-      - website_backend_network
+      - astro_kundan_network
     depends_on:
       - app
 
   mysql:
     image: mysql:8.0
-    container_name: website_backend_mysql
+    container_name: astro_kundan_mysql
     restart: unless-stopped
     ports:
       - "127.0.0.1:3308:3306"
     environment:
-      MYSQL_DATABASE: website_backend
+      MYSQL_DATABASE: astro_kundan
       MYSQL_ROOT_PASSWORD: rootsecret
       MYSQL_USER: laravel
       MYSQL_PASSWORD: secret
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - website_backend_network
+      - astro_kundan_network
 
   redis:
     image: redis:alpine
-    container_name: website_backend_redis
+    container_name: astro_kundan_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
-      - website_backend_network
+      - astro_kundan_network
 
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: website_backend_phpmyadmin
+    container_name: astro_kundan_phpmyadmin
     restart: unless-stopped
     ports:
       - "127.0.0.1:8081:80"
@@ -71,12 +71,12 @@ services:
       PMA_USER: laravel
       PMA_PASSWORD: secret
     networks:
-      - website_backend_network
+      - astro_kundan_network
     depends_on:
       - mysql
 
 networks:
-  website_backend_network:
+  astro_kundan_network:
     driver: bridge
 
 volumes:
